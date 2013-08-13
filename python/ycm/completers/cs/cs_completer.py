@@ -42,8 +42,12 @@ class CsharpCompleter( ThreadedCompleter ):
 
   def __init__( self ):
     super( CsharpCompleter, self ).__init__()
-    self._omnisharp_port = int( vimsupport.GetVariableValue(
-        'g:ycm_csharp_server_port' ) )
+
+    if vim.eval('exists("b:OmniSharp_host")') == '1':
+        self._omnisharp_port = vimsupport.GetVariableValue( 'b:OmniSharp_port' )
+    else:
+        self._omnisharp_port = int( vimsupport.GetVariableValue( 'g:ycm_csharp_server_port' ) )
+
     self._omnisharp_host = 'http://localhost:' + str( self._omnisharp_port )
     if vimsupport.GetBoolValue( 'g:ycm_auto_start_csharp_server' ):
       self._StartServer()
