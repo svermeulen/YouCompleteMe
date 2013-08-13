@@ -43,15 +43,17 @@ class CsharpCompleter( ThreadedCompleter ):
   def __init__( self ):
     super( CsharpCompleter, self ).__init__()
 
-    if vim.eval('exists("b:OmniSharp_host")') == '1':
-        self._omnisharp_port = vimsupport.GetVariableValue( 'b:OmniSharp_port' )
-    else:
-        self._omnisharp_port = int( vimsupport.GetVariableValue( 'g:ycm_csharp_server_port' ) )
-
-    self._omnisharp_host = 'http://localhost:' + str( self._omnisharp_port )
     if vimsupport.GetBoolValue( 'g:ycm_auto_start_csharp_server' ):
       self._StartServer()
 
+  def _GetOmnisharpHost( self ):
+    return 'http://localhost:' + str( self._GetOmnisharpPort() )
+
+  def _GetOmnisharpPort( self ):
+    if vim.eval('exists("b:OmniSharp_port")') == '1':
+        return int( vimsupport.GetVariableValue( 'b:OmniSharp_port' ) )
+
+    return int( vimsupport.GetVariableValue( 'g:ycm_csharp_server_port' ) )
 
   def OnVimLeave( self ):
     if vimsupport.GetBoolValue( 'g:ycm_auto_stop_csharp_server' ) and self._ServerIsRunning():
@@ -131,7 +133,7 @@ class CsharpCompleter( ThreadedCompleter ):
 
     solutionfile = os.path.join( folder, solutionfile )
     # command has to be provided as one string for some reason
-    command = [ omnisharp + ' -p ' + str( self._omnisharp_port ) + ' -s ' +
+    command = [ omnisharp + ' -p ' + str( self._GetOmnisharpPort() ) + ' -s ' +
                 solutionfile ]
 
     with open( os.devnull, 'w' ) as fnull:
@@ -165,8 +167,9 @@ class CsharpCompleter( ThreadedCompleter ):
 
 
   def _GetResponse( self, endPoint, parameters={}, silent = False ):
+
     """ Handle communication with server """
-    target = urlparse.urljoin( self._omnisharp_host, endPoint )
+    target = urlparse.urljoin( self._GetOmnisharpHost(), endPoint )
     parameters = urllib.urlencode( parameters )
     try:
       response = urllib2.urlopen( target, parameters )
