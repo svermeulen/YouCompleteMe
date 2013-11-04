@@ -112,8 +112,10 @@ function! s:SetUpKeyMappings()
     " With this command, when the completion window is visible, the tab key
     " (default) will select the next candidate in the window. In vim, this also
     " changes the typed-in text to that of the candidate completion.
-    exe 'inoremap <expr>' . key .
-          \ ' pumvisible() ? "\<C-n>" : "\' . key .'"'
+    "exe 'inoremap <expr>' . key .
+          "\ ' pumvisible() ? "\<C-n>" : "\' . key .'"'
+
+    exe 'inoremap <expr> ' . key . ' pumvisible() ? "\<C-n>" : ""'
   endfor
 
 
